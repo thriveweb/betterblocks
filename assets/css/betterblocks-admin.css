@@ -1,0 +1,142 @@
+/**
+ * 
+ * Tidy appearance of post titles in the editor
+ */
+
+.editor-styles-wrapper .edit-post-visual-editor__post-title-wrapper,
+.editor-styles-wrapper .edit-post-visual-editor__post-title-wrapper h1.wp-block-post-title {
+  margin-top: 0 !important;
+}
+
+h1.wp-block-post-title {
+  font-size: 18px;
+  line-height: 28px;
+  background-color: white;
+  padding: 10px 30px !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  border-bottom: 1px solid #e0e0e0 !important;
+}
+
+/**
+ * 
+ * Tidy appearance of blocks in the editor
+ */
+
+.editor-styles-wrapper {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.wp-block-post-content {
+  padding: 10px;
+  margin: 0 auto !important;
+  max-width: calc(100% - 60px);
+  width: calc(100% - 60px);
+}
+
+.wp-block-post-content .block-list-appender {
+  margin: 20px auto !important;
+}
+
+.wp-block {
+  margin: 0 auto !important;
+  max-width: 100%;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.wp-block-post-content.is-tablet-preview .wp-block,
+.wp-block-post-content.is-mobile-preview .wp-block {
+  max-width: 100%;
+  width: 100%;
+}
+
+.components-popover.block-editor-block-popover {
+  z-index: 20000000001 !important;
+}
+
+.acf-block-body .acf-block-fields {
+  z-index: 99999999 !important;
+}
+
+/**
+ * 
+ * Change opacity for blocks set as 'hidden'
+ */
+
+.hide-block--active {
+  opacity: 0.4;
+}
+
+/**
+ *
+ * Resizable sideabr
+ */
+
+.interface-interface-skeleton__sidebar .interface-complementary-area,
+.interface-interface-skeleton__sidebar .interface-complementary-area__fill {
+  width: 100% !important;
+}
+
+.edit-post-layout:not(.is-sidebar-opened) .interface-interface-skeleton__sidebar,
+.edit-site-layout:not(.is-sidebar-opened) .interface-interface-skeleton__sidebar {
+  display: none !important;
+}
+
+.interface-interface-skeleton__sidebar.ui-resizable-resizing {
+  position: relative !important;
+}
+
+.interface-interface-skeleton__sidebar {
+  position: relative !important;
+  display: block !important;
+  z-index: 100000 !important;
+}
+
+.custom-resizable-handle {
+  position: absolute;
+  left: -5px;
+  top: 0;
+  bottom: 0;
+  width: 15px;
+  cursor: ew-resize;
+}
+
+.ui-resizable-w {
+  width: 15px;
+  left: -5px;
+  cursor: ew-resize;
+}
+
+.ui-resizable-handle.ui-resizable-w {
+  width: 15px !important;
+  left: 0 !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  transition: background-color 0.3s ease;
+  cursor: ew-resize !important;
+  z-index: 100001 !important;
+  position: absolute !important;
+}
+
+.interface-navigable-region.interface-interface-skeleton__sidebar {
+  padding-left: 15px !important;
+}
+
+.betterblocks-resize-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 3px;
+  height: 30px;
+  background-color: #1e1e1e;
+  border-radius: 2px;
+}
+
+.custom-resizable-handle,
+.ui-resizable-handle.ui-resizable-w,
+.ui-resizable-resizing .custom-resizable-handle {
+  background-color: #f1f1f1 !important;
+}
