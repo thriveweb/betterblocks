@@ -26,7 +26,7 @@
 
   addFilter('blocks.registerBlockType', 'betterblocks/hide-block-attribute', function (settings, name) {
     settings.attributes = Object.assign(settings.attributes, {
-      disable_frontend_block: {
+      betterblocks_disable_frontend_block: {
         type: 'boolean',
         default: false,
       },
@@ -38,7 +38,7 @@
   var withInspectorControl = createHigherOrderComponent(function (BlockEdit) {
     return function (props) {
       var toggleHideBlock = function () {
-        props.setAttributes({ disable_frontend_block: !props.attributes.disable_frontend_block });
+        props.setAttributes({ betterblocks_disable_frontend_block: !props.attributes.betterblocks_disable_frontend_block });
       };
 
       return wp.element.createElement(
@@ -51,21 +51,21 @@
             ToolbarGroup,
             { className: 'hide-block__toolbar' },
             wp.element.createElement(ToolbarButton, {
-              icon: props.attributes.disable_frontend_block ? 'hidden' : 'visibility',
-              label: props.attributes.disable_frontend_block ? __('Show Block', 'betterblocks') : __('Hide Block', 'betterblocks'),
+              icon: props.attributes.betterblocks_disable_frontend_block ? 'hidden' : 'visibility',
+              label: props.attributes.betterblocks_disable_frontend_block ? __('Show Block', 'betterblocks') : __('Hide Block', 'betterblocks'),
               onClick: toggleHideBlock,
             })
           )
         ),
-        wp.element.createElement('div', { className: props.attributes.disable_frontend_block ? 'hide-block--active' : '' }, wp.element.createElement(BlockEdit, props)),
+        wp.element.createElement('div', { className: props.attributes.betterblocks_disable_frontend_block ? 'hide-block--active' : '' }, wp.element.createElement(BlockEdit, props)),
         wp.element.createElement(
           InspectorAdvancedControls,
           null,
           wp.element.createElement(ToggleControl, {
             label: __('Hide Block', 'betterblocks'),
-            checked: !!props.attributes.disable_frontend_block,
+            checked: !!props.attributes.betterblocks_disable_frontend_block,
             onChange: toggleHideBlock,
-            help: props.attributes.disable_frontend_block ? __('Block is hidden', 'betterblocks') : __('Block is visible', 'betterblocks'),
+            help: props.attributes.betterblocks_disable_frontend_block ? __('Block is hidden', 'betterblocks') : __('Block is visible', 'betterblocks'),
           })
         )
       );

@@ -54,11 +54,11 @@ register_activation_hook(__FILE__, array('BetterBlocks', 'activate'));
  *
  * @since    1.0.0
  */
-function run_betterblocks() {
+function betterblocks_run() {
 
 	$plugin = new BetterBlocks();
 	$plugin->run();
 
 }
-run_betterblocks();
+betterblocks_run();
 

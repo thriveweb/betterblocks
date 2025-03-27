@@ -59,9 +59,9 @@ class BetterBlocks {
 
 		$this->plugin_name = 'betterblocks';
 
-		$this->load_dependencies();
+		$this->betterblocks_load_dependencies();
 
-		$this->define_admin_hooks();
+		$this->betterblocks_define_admin_hooks();
 
 	}
 
@@ -71,7 +71,7 @@ class BetterBlocks {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function load_dependencies() {
+	private function betterblocks_load_dependencies() {
 
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-betterblocks-loader.php';
 
@@ -85,25 +85,23 @@ class BetterBlocks {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function define_admin_hooks() {
+	private function betterblocks_define_admin_hooks() {
 
-		$this->loader->add_action( 'admin_enqueue_scripts', $this, 'enqueue_scripts_styles' );
+		$this->loader->add_action( 'admin_enqueue_scripts', $this, 'betterblocks_enqueue_assets' );
 
 		$this->loader->add_action( 'admin_menu', $this, 'betterblocks_add_menu_page' );
 
 		$this->loader->add_action( 'admin_init', $this, 'betterblocks_register_settings' );
 
-		$this->loader->add_action( 'init', $this, 'betterblocks_remove_block_directory_assets' );
-
-		$this->loader->add_action( 'admin_enqueue_scripts', $this, 'betterblocks_force_preview_mode_assets' );
-
-		$this->loader->add_action( 'enqueue_block_editor_assets', $this, 'betterblocks_acf_sidebar_fields_css' );
-
-		$this->loader->add_filter( 'use_block_editor_for_post_type', $this, 'betterblocks_post_type_support', 10, 2 );
+		$this->loader->add_action( 'init', $this, 'betterblocks_remove_directory' );
+		
+		$this->loader->add_action( 'admin_enqueue_scripts', $this, 'betterblocks_force_preview' );
+		
+		$this->loader->add_action( 'enqueue_block_editor_assets', $this, 'betterblocks_sidebar_acf' );
+		
+		$this->loader->add_filter( 'use_block_editor_for_post_type', $this, 'betterblocks_post_types', 10, 2 );
 
 		$this->loader->add_filter( 'render_block', $this, 'betterblocks_block_visibility', 10, 3 );
-
-		$this->loader->add_filter( 'plugin_action_links_betterblocks/betterblocks.php', $this, 'betterblocks_plugin_settings_link' );
 
 	}
 
@@ -112,7 +110,7 @@ class BetterBlocks {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_scripts_styles() {
+	public function betterblocks_enqueue_assets() {
 
 		wp_enqueue_script( 'jquery-ui-resizable' );
 
@@ -131,19 +129,6 @@ class BetterBlocks {
 			$this->version, 
 			'all' 
 		);
-
-	}
-
-	/**
-	 * Link to settings page from plugin list.
-	 * 
-	 * @since    1.0.0
-	 */
-	public function betterblocks_plugin_settings_link( $links ) {
-
-		$settings_link = '<a href="admin.php?page=betterblocks-settings">Settings</a>';
-		array_unshift( $links, $settings_link );
-		return $links;
 
 	}
 
@@ -188,17 +173,17 @@ class BetterBlocks {
 				do_settings_sections( 'betterblocks-settings' ); ?>
 
 				<?php
-				$post_types = get_post_types( array( 'public' => true ), 'objects' );
-				$disabled_post_types = array_map( 'sanitize_key', (array) get_option( 'post_type_support', array() ) ); ?>
+				$betterblocks_registered_post_types = get_post_types( array( 'public' => true ), 'objects' );
+				$betterblocks_post_types = array_map( 'sanitize_key', (array) get_option( 'betterblocks_post_types', array() ) ); ?>
 				<div class="postbox" style="padding: 20px; margin-bottom: 20px;">
 					<h3 style="margin-top: 0;"><?php echo esc_html__( 'Post Type Compatibility', 'betterblocks' ); ?></h3>
 					<p><?php echo esc_html__( 'Disable the block editor for specific post types. This is useful for content that may be better suited for the classic editor:', 'betterblocks' ); ?></p>
 					<?php
-					foreach ( $post_types as $post_type ) {
+					foreach ( $betterblocks_registered_post_types as $post_type ) {
 						if ( $post_type->name !== 'attachment' ) { // Exclude 'attachment' (Media)
 							?>
 							<label style="display: block; margin-bottom: 10px;">
-								<input type="checkbox" name="post_type_support[]" value="<?php echo esc_attr( $post_type->name ); ?>" <?php checked( in_array( $post_type->name, $disabled_post_types ) ); ?> />
+								<input type="checkbox" name="betterblocks_post_types[]" value="<?php echo esc_attr( $post_type->name ); ?>" <?php checked( in_array( $post_type->name, $betterblocks_post_types ) ); ?> />
 								<?php echo esc_html( $post_type->label ); ?>
 							</label>
 							<?php
@@ -208,36 +193,36 @@ class BetterBlocks {
 				</div>
 
 				<?php 
-				$remove_block_directory = boolval( get_option( 'remove_block_directory', 1 ) ); ?>
+				$betterblocks_remove_directory = boolval( get_option( 'betterblocks_remove_directory', 1 ) ); ?>
 				<div class="postbox" style="padding: 20px; margin-bottom: 20px;">
 					<h3 style="margin-top: 0;"><?php echo esc_html__( 'Block Directory Visibility', 'betterblocks' ); ?></h3>
 					<p><?php echo esc_html__( 'Show or hide the block directory in the block editor sidebar which promotes additional blocks available for installation:', 'betterblocks' ); ?></p>
-					<label for="remove_block_directory">
-						<input type="checkbox" id="remove_block_directory" name="remove_block_directory" value="1" <?php checked( $remove_block_directory, 1 ); ?> />
+					<label for="betterblocks_remove_directory">
+						<input type="checkbox" id="betterblocks_remove_directory" name="betterblocks_remove_directory" value="1" <?php checked( $betterblocks_remove_directory, 1 ); ?> />
 						<?php echo esc_html__( 'Hide the block directory in the block editor?', 'betterblocks' ); ?>
 					</label>
 				</div>
 
 				<?php 
-				$force_preview_mode = boolval( get_option( 'force_preview_mode', 1 ) ); ?>
+				$betterblocks_force_preview = boolval( get_option( 'betterblocks_force_preview', 1 ) ); ?>
 				<div class="postbox" style="padding: 20px; margin-bottom: 20px;">
 					<h3 style="margin-top: 0;"><?php echo esc_html__( 'ACF Block Preview Mode', 'betterblocks' ); ?></h3>
 					<p><?php echo esc_html__( 'Force ACF (Advanced Custom Fields) blocks to load in preview mode by default, making it easier to see actual content layouts in the editor:', 'betterblocks' ); ?></p>
 
-					<label for="force_preview_mode">
-						<input type="checkbox" id="force_preview_mode" name="force_preview_mode" value="1" <?php checked( $force_preview_mode, 1 ); ?> />
+					<label for="betterblocks_force_preview">
+						<input type="checkbox" id="betterblocks_force_preview" name="betterblocks_force_preview" value="1" <?php checked( $betterblocks_force_preview, 1 ); ?> />
 						<?php echo esc_html__( 'Force preview mode for ACF blocks?', 'betterblocks' ); ?>
 					</label>
 				</div>
 
 				<?php 
-				$acf_sidebar_fields = boolval( get_option( 'acf_sidebar_fields', 1 ) ); ?>
+				$betterblocks_sidebar_acf = boolval( get_option( 'betterblocks_sidebar_acf', 1 ) ); ?>
 				<div class="postbox" style="padding: 20px; margin-bottom: 20px;">
 					<h3 style="margin-top: 0;"><?php echo esc_html__( 'ACF Fields in Sidebar', 'betterblocks' ); ?></h3>
 					<p><?php echo esc_html__( 'Allow ACF (Advanced Custom Fields) fields to appear in the sidebar when an ACF block is selected:', 'betterblocks' ); ?></p>
 
-					<label for="acf_sidebar_fields">
-						<input type="checkbox" id="acf_sidebar_fields" name="acf_sidebar_fields" value="1" <?php checked( $acf_sidebar_fields, 1 ); ?> />
+					<label for="betterblocks_sidebar_acf">
+						<input type="checkbox" id="betterblocks_sidebar_acf" name="betterblocks_sidebar_acf" value="1" <?php checked( $betterblocks_sidebar_acf, 1 ); ?> />
 						<?php echo esc_html__( 'Show ACF fields in the sidebar?', 'betterblocks' ); ?>
 					</label>
 				</div>
@@ -259,20 +244,20 @@ class BetterBlocks {
 	 * @static
 	 */
 	public static function activate() {
-		if (get_option('post_type_support') === false) {
-			add_option('post_type_support', array());
+		if (get_option('betterblocks_post_types') === false) {
+			add_option('betterblocks_post_types', array());
 		}
 		
-		if (get_option('remove_block_directory') === false) {
-				add_option('remove_block_directory', 1);
+		if (get_option('betterblocks_remove_directory') === false) {
+				add_option('betterblocks_remove_directory', 1);
 		}
 		
-		if (get_option('force_preview_mode') === false) {
-			add_option('force_preview_mode', 1);
+		if (get_option('betterblocks_force_preview') === false) {
+			add_option('betterblocks_force_preview', 1);
 		}
 		
-		if (get_option('acf_sidebar_fields') === false) {
-			add_option('acf_sidebar_fields', 1);
+		if (get_option('betterblocks_sidebar_acf') === false) {
+			add_option('betterblocks_sidebar_acf', 1);
 		}
 	}
 
@@ -283,10 +268,10 @@ class BetterBlocks {
 	 */
 	public function betterblocks_register_settings() {
 
-		register_setting( 'betterblocks_settings_group', 'post_type_support', 'sanitize_post_type_support' );
-    register_setting( 'betterblocks_settings_group', 'remove_block_directory', 'absint' );
-    register_setting( 'betterblocks_settings_group', 'force_preview_mode', 'absint' );
-    register_setting( 'betterblocks_settings_group', 'acf_sidebar_fields', 'absint' );
+		register_setting( 'betterblocks_settings_group', 'betterblocks_post_types', 'betterblocks_sanitize_post_types' );
+    register_setting( 'betterblocks_settings_group', 'betterblocks_remove_directory', 'absint' );
+    register_setting( 'betterblocks_settings_group', 'betterblocks_force_preview', 'absint' );
+    register_setting( 'betterblocks_settings_group', 'betterblocks_sidebar_acf', 'absint' );
 
 	}
 
@@ -296,7 +281,7 @@ class BetterBlocks {
 	 * @since    1.0.0
 	 */
 
-	public function sanitize_post_type_support( $input ) {
+	public function betterblocks_sanitize_post_types( $input ) {
 
     if ( !is_array( $input ) ) {
 			return array();
@@ -307,26 +292,43 @@ class BetterBlocks {
 	}
 
 	/**
-	 * Callback function for remove_block_directory plugin setting.
+	 * Callback function for post_type_support plugin setting.
 	 * 
 	 * @since    1.0.0
 	 */
-	public function betterblocks_remove_block_directory_assets() {
+	public function betterblocks_post_types( $current_status, $post_type ) {
 
-		if ( get_option( 'remove_block_directory', 0 ) ) {
+		$betterblocks_post_types = get_option( 'betterblocks_post_types', array() );
+
+		if ( !is_array( get_option( 'betterblocks_post_types', array() ) ) ) {
+			$betterblocks_post_types = array();
+		}
+		
+		return in_array( $post_type, $betterblocks_post_types ) ? 0 : $current_status;
+
+	}
+
+	/**
+	 * Callback function for betterblocks_remove_directory plugin setting.
+	 * 
+	 * @since    1.0.0
+	 */
+	public function betterblocks_remove_directory() {
+
+		if ( get_option( 'betterblocks_remove_directory', 0 ) ) {
 			remove_action( 'enqueue_block_editor_assets', 'wp_enqueue_editor_block_directory_assets' );
 		}
 
 	}
 
 	/**
-	 * Callback function for force_preview_mode plugin setting.
+	 * Callback function for betterblocks_force_preview plugin setting.
 	 * 
 	 * @since    1.0.0
 	 */
-	public function betterblocks_force_preview_mode_assets() {
+	public function betterblocks_force_preview() {
 
-		if ( !get_option( 'force_preview_mode', 0 ) ) {
+		if ( !get_option( 'betterblocks_force_preview', 0 ) ) {
 			return;
 		}
 
@@ -341,33 +343,15 @@ class BetterBlocks {
 	}
 
 	/**
-	 * Callback function for acf_sidebar_fields plugin setting.
+	 * Callback function for betterblocks_sidebar_acf plugin setting.
 	 * 
 	 * @since    1.0.0
 	 */
-	public function betterblocks_acf_sidebar_fields_css() {
+	public function betterblocks_sidebar_acf() {
 
-		if ( !get_option( 'acf_sidebar_fields', 0 ) ) {
-			$custom_css = ".block-editor .acf-block-panel { display: none !important; }";
-			wp_add_inline_style( 'wp-block-editor', $custom_css );
+		if ( !get_option( 'betterblocks_sidebar_acf', 0 ) ) {
+			wp_add_inline_style( 'wp-block-editor', '.block-editor .acf-block-panel { display: none !important; }' );
 		}
-
-	}
-
-	/**
-	 * Callback function for post_type_support plugin setting.
-	 * 
-	 * @since    1.0.0
-	 */
-	public function betterblocks_post_type_support( $current_status, $post_type ) {
-
-		$disabled_post_types = get_option( 'post_type_support', array() );
-
-		if ( !is_array( get_option( 'post_type_support', array() ) ) ) {
-			$disabled_post_types = array();
-		}
-		
-		return in_array( $post_type, $disabled_post_types ) ? 0 : $current_status;;
 
 	}
 
@@ -378,7 +362,7 @@ class BetterBlocks {
 	 */
 	public function betterblocks_block_visibility( $block_content, $block ) {
 
-		return !empty( $block['attrs']['disable_frontend_block'] ) ? '' : $block_content;
+		return !empty( $block['attrs']['betterblocks_disable_frontend_block'] ) ? '' : $block_content;
 
 	}
 
