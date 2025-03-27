@@ -2,7 +2,7 @@
 
 Contributors: deanoakley
 Donate link: https://thriveweb.com.au/
-Tags: block editor, optimisation, usability
+Tags: betterblocks, block editor, optimisation, usability
 Requires at least: 5.0
 Tested up to: 6.7
 Stable tag: 1.0.0
