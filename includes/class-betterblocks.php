@@ -141,8 +141,8 @@ class BetterBlocks {
 
 		add_submenu_page(
 			'tools.php',
-			esc_html__( 'BetterBlocks Settings', 'betterblocks-main' ),
-			esc_html__( 'BetterBlocks', 'betterblocks-main'),
+			esc_html__( 'BetterBlocks Settings', 'betterblocks' ),
+			esc_html__( 'BetterBlocks', 'betterblocks'),
 			'manage_options',
 			'betterblocks-settings',
 			array( $this, 'betterblocks_settings_page' ),
@@ -158,14 +158,14 @@ class BetterBlocks {
 	function betterblocks_settings_page() {
 
 		if ( !current_user_can( 'manage_options' ) ) {
-			wp_die(esc_html__( 'You do not have sufficient permissions to access this page.', 'betterblocks-main' ) );
+			wp_die(esc_html__( 'You do not have sufficient permissions to access this page.', 'betterblocks' ) );
 		} 
 		
 		?>
 		
 		<div class="wrap">
 
-			<h1><?php echo esc_html__( 'BetterBlocks Settings', 'betterblocks-main' ); ?></h1><br>
+			<h1><?php echo esc_html__( 'BetterBlocks Settings', 'betterblocks' ); ?></h1><br>
 
 			<form method="post" action="<?php echo esc_url( admin_url( 'options.php' ) ); ?>">
 				<?php 
@@ -176,8 +176,8 @@ class BetterBlocks {
 				$betterblocks_registered_post_types = get_post_types( array( 'public' => true ), 'objects' );
 				$betterblocks_post_types = array_map( 'sanitize_key', (array) get_option( 'betterblocks_post_types', array() ) ); ?>
 				<div class="postbox" style="padding: 20px; margin-bottom: 20px;">
-					<h3 style="margin-top: 0;"><?php echo esc_html__( 'Post Type Compatibility', 'betterblocks-main' ); ?></h3>
-					<p><?php echo esc_html__( 'Disable the block editor for specific post types. This is useful for content that may be better suited for the classic editor:', 'betterblocks-main' ); ?></p>
+					<h3 style="margin-top: 0;"><?php echo esc_html__( 'Post Type Compatibility', 'betterblocks' ); ?></h3>
+					<p><?php echo esc_html__( 'Disable the block editor for specific post types. This is useful for content that may be better suited for the classic editor:', 'betterblocks' ); ?></p>
 					<?php
 					foreach ( $betterblocks_registered_post_types as $post_type ) {
 						if ( $post_type->name !== 'attachment' ) { // Exclude 'attachment' (Media)
@@ -195,35 +195,35 @@ class BetterBlocks {
 				<?php 
 				$betterblocks_remove_directory = boolval( get_option( 'betterblocks_remove_directory', 1 ) ); ?>
 				<div class="postbox" style="padding: 20px; margin-bottom: 20px;">
-					<h3 style="margin-top: 0;"><?php echo esc_html__( 'Block Directory Visibility', 'betterblocks-main' ); ?></h3>
-					<p><?php echo esc_html__( 'Show or hide the block directory in the block editor sidebar which promotes additional blocks available for installation:', 'betterblocks-main' ); ?></p>
+					<h3 style="margin-top: 0;"><?php echo esc_html__( 'Block Directory Visibility', 'betterblocks' ); ?></h3>
+					<p><?php echo esc_html__( 'Show or hide the block directory in the block editor sidebar which promotes additional blocks available for installation:', 'betterblocks' ); ?></p>
 					<label for="betterblocks_remove_directory">
 						<input type="checkbox" id="betterblocks_remove_directory" name="betterblocks_remove_directory" value="1" <?php checked( $betterblocks_remove_directory, 1 ); ?> />
-						<?php echo esc_html__( 'Hide the block directory in the block editor?', 'betterblocks-main' ); ?>
+						<?php echo esc_html__( 'Hide the block directory in the block editor?', 'betterblocks' ); ?>
 					</label>
 				</div>
 
 				<?php 
 				$betterblocks_force_preview = boolval( get_option( 'betterblocks_force_preview', 1 ) ); ?>
 				<div class="postbox" style="padding: 20px; margin-bottom: 20px;">
-					<h3 style="margin-top: 0;"><?php echo esc_html__( 'ACF Block Preview Mode', 'betterblocks-main' ); ?></h3>
-					<p><?php echo esc_html__( 'Force ACF (Advanced Custom Fields) blocks to load in preview mode by default, making it easier to see actual content layouts in the editor:', 'betterblocks-main' ); ?></p>
+					<h3 style="margin-top: 0;"><?php echo esc_html__( 'ACF Block Preview Mode', 'betterblocks' ); ?></h3>
+					<p><?php echo esc_html__( 'Force ACF (Advanced Custom Fields) blocks to load in preview mode by default, making it easier to see actual content layouts in the editor:', 'betterblocks' ); ?></p>
 
 					<label for="betterblocks_force_preview">
 						<input type="checkbox" id="betterblocks_force_preview" name="betterblocks_force_preview" value="1" <?php checked( $betterblocks_force_preview, 1 ); ?> />
-						<?php echo esc_html__( 'Force preview mode for ACF blocks?', 'betterblocks-main' ); ?>
+						<?php echo esc_html__( 'Force preview mode for ACF blocks?', 'betterblocks' ); ?>
 					</label>
 				</div>
 
 				<?php 
 				$betterblocks_sidebar_acf = boolval( get_option( 'betterblocks_sidebar_acf', 1 ) ); ?>
 				<div class="postbox" style="padding: 20px; margin-bottom: 20px;">
-					<h3 style="margin-top: 0;"><?php echo esc_html__( 'ACF Fields in Sidebar', 'betterblocks-main' ); ?></h3>
-					<p><?php echo esc_html__( 'Allow ACF (Advanced Custom Fields) fields to appear in the sidebar when an ACF block is selected:', 'betterblocks-main' ); ?></p>
+					<h3 style="margin-top: 0;"><?php echo esc_html__( 'ACF Fields in Sidebar', 'betterblocks' ); ?></h3>
+					<p><?php echo esc_html__( 'Allow ACF (Advanced Custom Fields) fields to appear in the sidebar when an ACF block is selected:', 'betterblocks' ); ?></p>
 
 					<label for="betterblocks_sidebar_acf">
 						<input type="checkbox" id="betterblocks_sidebar_acf" name="betterblocks_sidebar_acf" value="1" <?php checked( $betterblocks_sidebar_acf, 1 ); ?> />
-						<?php echo esc_html__( 'Show ACF fields in the sidebar?', 'betterblocks-main' ); ?>
+						<?php echo esc_html__( 'Show ACF fields in the sidebar?', 'betterblocks' ); ?>
 					</label>
 				</div>
 
