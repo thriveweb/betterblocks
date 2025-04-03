@@ -9,14 +9,14 @@
  * that starts the plugin.
  *
  * @link              https://thriveweb.com.au
- * @since             1.0.0
+ * @since             1.0.1
  * @package           BetterBlocks
  *
  * @wordpress-plugin
  * Plugin Name:       BetterBlocks
  * Plugin URI:        https://thriveweb.com.au/the-lab/betterblocks/
  * Description:       Handy improvements for the Wordpress block editor interface such as post type support, hiding blocks, adjustable sidebar, and more.
- * Version:           1.0.0
+ * Version:           1.0.1
  * Author:            Thrive Digital
  * Author URI:        https://thriveweb.com.au/
  * License:           GPL-2.0+
