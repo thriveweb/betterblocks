@@ -116,7 +116,7 @@ class BetterBlocks {
 
 		wp_enqueue_script( 
 			$this->plugin_name, 
-			plugin_dir_url( __FILE__ ) . '../assets/js/betterblocks-admin.js', 
+			plugin_dir_url( __FILE__ ) . '../js/betterblocks-admin.js', 
 			array( 'jquery', 'jquery-ui-resizable', 'wp-blocks', 'wp-element', 'wp-components', 'wp-editor', 'wp-compose', 'wp-i18n', 'wp-data' ), 
 			$this->version, 
 			false 
@@ -124,7 +124,7 @@ class BetterBlocks {
 
 		wp_enqueue_style( 
 			$this->plugin_name, 
-			plugin_dir_url( __FILE__ ) . '../assets/css/betterblocks-admin.css', 
+			plugin_dir_url( __FILE__ ) . '../css/betterblocks-admin.css', 
 			array(), 
 			$this->version, 
 			'all' 
@@ -334,7 +334,7 @@ class BetterBlocks {
 
 		wp_enqueue_script(
 			'betterblocks-force-preview',
-			plugin_dir_url(__FILE__) . '../assets/js/betterblocks-force-preview.js',
+			plugin_dir_url(__FILE__) . '../js/betterblocks-force-preview.js',
 			array( 'jquery', 'wp-dom-ready', 'wp-data', 'wp-blocks', 'wp-element' ),
 			$this->version,
 			true
