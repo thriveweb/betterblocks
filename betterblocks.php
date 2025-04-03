@@ -1,22 +1,9 @@
 <?php
-
 /**
- * The plugin bootstrap file
- *
- * This file is read by WordPress to generate the plugin information in the plugin
- * admin area. This file also includes all of the dependencies used by the plugin,
- * registers the activation and deactivation functions, and defines a function
- * that starts the plugin.
- *
- * @link              https://thriveweb.com.au
- * @since             1.0.1
- * @package           BetterBlocks
- *
- * @wordpress-plugin
  * Plugin Name:       BetterBlocks
  * Plugin URI:        https://thriveweb.com.au/the-lab/betterblocks/
  * Description:       Handy improvements for the Wordpress block editor interface such as post type support, hiding blocks, adjustable sidebar, and more.
- * Version:           1.0.1
+ * Version:           1.0.3
  * Author:            Thrive Digital
  * Author URI:        https://thriveweb.com.au/
  * License:           GPL-2.0+
