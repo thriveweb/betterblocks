@@ -1,0 +1,4 @@
+.github
+workflows
+*.log
+*.zip
