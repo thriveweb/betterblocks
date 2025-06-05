@@ -20,6 +20,7 @@ jobs:
         with:
           slug: betterblocks
           build-dir: ./
+          assets-dir: ./assets
         env:
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
