@@ -16,7 +16,7 @@ jobs:
 
       # Deploy to WordPress.org via SVN
       - name: WordPress Plugin Deploy
-        uses: 10up/action-wordpress-plugin-deploy@2.3.0
+        uses: 10up/action-wordpress-plugin-deploy@1.4.0
         with:
           slug: betterblocks
           build-dir: ./
