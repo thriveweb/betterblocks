@@ -5,7 +5,7 @@ Donate link: https://thriveweb.com.au/
 Tags: betterblocks, block editor, optimisation, usability
 Requires at least: 5.0
 Tested up to: 6.8.1
-Stable tag: 1.0.15
+Stable tag: 1.0.16
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -42,6 +42,9 @@ Yes! BetterBlocks lets you choose which of the registered post types on your web
 No, BetterBlocks doesn’t add new blocks, but rather focuses on enhancing the existing Wordpress editor experience.
 
 == Changelog ==
+
+= 1.0.16 =
+* Version bump
 
 = 1.0.15 =
 * Update Wordpress plugin banner and icon assets.
