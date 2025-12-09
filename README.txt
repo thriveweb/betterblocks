@@ -5,7 +5,7 @@ Donate link: https://thriveweb.com.au/
 Tags: betterblocks, block editor, optimisation, usability
 Requires at least: 5.0
 Tested up to: 6.8.1
-Stable tag: 1.0.16
+Stable tag: 1.0.17
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -43,7 +43,7 @@ No, BetterBlocks doesn’t add new blocks, but rather focuses on enhancing the e
 
 == Changelog ==
 
-= 1.0.16 =
+= 1.0.17 =
 * Version bump
 
 = 1.0.15 =
