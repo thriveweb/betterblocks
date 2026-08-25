@@ -87,7 +87,7 @@ class BetterBlocks {
 	 */
 	private function betterblocks_define_admin_hooks() {
 
-		$this->loader->add_action( 'admin_enqueue_scripts', $this, 'betterblocks_enqueue_assets' );
+		$this->loader->add_action( 'enqueue_block_editor_assets', $this, 'betterblocks_enqueue_assets' );
 
 		$this->loader->add_action( 'admin_menu', $this, 'betterblocks_add_menu_page' );
 
@@ -95,13 +95,12 @@ class BetterBlocks {
 
 		$this->loader->add_action( 'init', $this, 'betterblocks_remove_directory' );
 		
-		$this->loader->add_action( 'admin_enqueue_scripts', $this, 'betterblocks_force_preview' );
 		
-		$this->loader->add_action( 'enqueue_block_editor_assets', $this, 'betterblocks_sidebar_acf' );
+		$this->loader->add_action( 'enqueue_block_assets', $this, 'betterblocks_enqueue_editor_styles' );
 		
 		$this->loader->add_filter( 'use_block_editor_for_post_type', $this, 'betterblocks_post_types', 10, 2 );
 
-		$this->loader->add_filter( 'render_block', $this, 'betterblocks_block_visibility', 10, 3 );
+		$this->loader->add_filter( 'render_block', $this, 'betterblocks_block_visibility', 10, 2 );
 
 	}
 
@@ -114,20 +113,54 @@ class BetterBlocks {
 
 		wp_enqueue_script( 'jquery-ui-resizable' );
 
-		wp_enqueue_script( 
-			$this->plugin_name, 
-			plugin_dir_url( __FILE__ ) . '../js/betterblocks-admin.js', 
-			array( 'jquery', 'jquery-ui-resizable', 'wp-blocks', 'wp-element', 'wp-components', 'wp-editor', 'wp-compose', 'wp-i18n', 'wp-data' ), 
-			$this->version, 
-			false 
+		wp_enqueue_script(
+			$this->plugin_name,
+			plugin_dir_url( __FILE__ ) . '../js/betterblocks-admin.js',
+			array(
+				'jquery',
+				'jquery-ui-resizable',
+				'wp-block-editor',
+				'wp-components',
+				'wp-compose',
+				'wp-element',
+				'wp-hooks',
+				'wp-i18n',
+				'wp-data',
+			),
+			$this->version,
+			true
 		);
 
-		wp_enqueue_style( 
-			$this->plugin_name, 
-			plugin_dir_url( __FILE__ ) . '../css/betterblocks-admin.css', 
-			array(), 
-			$this->version, 
-			'all' 
+		wp_enqueue_style(
+			$this->plugin_name,
+			plugin_dir_url( __FILE__ ) . '../css/betterblocks-admin.css',
+			array(),
+			$this->version,
+			'all'
+		);
+
+	}
+
+	/**
+	 * Register styles that belong inside the block editor canvas.
+	 *
+	 * WordPress 7.1 always renders the editor canvas in an iframe, so
+	 * block/content styles need to be enqueued with enqueue_block_assets.
+	 *
+	 * @since    1.0.18
+	 */
+	public function betterblocks_enqueue_editor_styles() {
+
+		if ( ! is_admin() ) {
+			return;
+		}
+
+		wp_enqueue_style(
+			'betterblocks-editor',
+			plugin_dir_url( __FILE__ ) . '../css/betterblocks-editor.css',
+			array(),
+			$this->version,
+			'all'
 		);
 
 	}
@@ -203,30 +236,6 @@ class BetterBlocks {
 					</label>
 				</div>
 
-				<?php 
-				$betterblocks_force_preview = boolval( get_option( 'betterblocks_force_preview', 1 ) ); ?>
-				<div class="postbox" style="padding: 20px; margin-bottom: 20px;">
-					<h3 style="margin-top: 0;"><?php echo esc_html__( 'ACF Block Preview Mode', 'betterblocks' ); ?></h3>
-					<p><?php echo esc_html__( 'Force ACF (Advanced Custom Fields) blocks to load in preview mode by default, making it easier to see actual content layouts in the editor:', 'betterblocks' ); ?></p>
-
-					<label for="betterblocks_force_preview">
-						<input type="checkbox" id="betterblocks_force_preview" name="betterblocks_force_preview" value="1" <?php checked( $betterblocks_force_preview, 1 ); ?> />
-						<?php echo esc_html__( 'Force preview mode for ACF blocks?', 'betterblocks' ); ?>
-					</label>
-				</div>
-
-				<?php 
-				$betterblocks_sidebar_acf = boolval( get_option( 'betterblocks_sidebar_acf', 1 ) ); ?>
-				<div class="postbox" style="padding: 20px; margin-bottom: 20px;">
-					<h3 style="margin-top: 0;"><?php echo esc_html__( 'ACF Fields in Sidebar', 'betterblocks' ); ?></h3>
-					<p><?php echo esc_html__( 'Allow ACF (Advanced Custom Fields) fields to appear in the sidebar when an ACF block is selected:', 'betterblocks' ); ?></p>
-
-					<label for="betterblocks_sidebar_acf">
-						<input type="checkbox" id="betterblocks_sidebar_acf" name="betterblocks_sidebar_acf" value="1" <?php checked( $betterblocks_sidebar_acf, 1 ); ?> />
-						<?php echo esc_html__( 'Show ACF fields in the sidebar?', 'betterblocks' ); ?>
-					</label>
-				</div>
-
 				<?php submit_button(); ?>
 
 			</form>
@@ -251,15 +260,7 @@ class BetterBlocks {
 		if (get_option('betterblocks_remove_directory') === false) {
 				add_option('betterblocks_remove_directory', 1);
 		}
-		
-		if (get_option('betterblocks_force_preview') === false) {
-			add_option('betterblocks_force_preview', 1);
-		}
-		
-		if (get_option('betterblocks_sidebar_acf') === false) {
-			add_option('betterblocks_sidebar_acf', 1);
-		}
-	}
+					}
 
 	/**
 	 * Register and save form values within plugin settings page.
@@ -268,10 +269,8 @@ class BetterBlocks {
 	 */
 	public function betterblocks_register_settings() {
 
-		register_setting( 'betterblocks_settings_group', 'betterblocks_post_types', 'betterblocks_sanitize_post_types' );
+		register_setting( 'betterblocks_settings_group', 'betterblocks_post_types', array( $this, 'betterblocks_sanitize_post_types' ) );
     register_setting( 'betterblocks_settings_group', 'betterblocks_remove_directory', 'absint' );
-    register_setting( 'betterblocks_settings_group', 'betterblocks_force_preview', 'absint' );
-    register_setting( 'betterblocks_settings_group', 'betterblocks_sidebar_acf', 'absint' );
 
 	}
 
@@ -317,40 +316,6 @@ class BetterBlocks {
 
 		if ( get_option( 'betterblocks_remove_directory', 0 ) ) {
 			remove_action( 'enqueue_block_editor_assets', 'wp_enqueue_editor_block_directory_assets' );
-		}
-
-	}
-
-	/**
-	 * Callback function for betterblocks_force_preview plugin setting.
-	 * 
-	 * @since    1.0.0
-	 */
-	public function betterblocks_force_preview() {
-
-		if ( !get_option( 'betterblocks_force_preview', 0 ) ) {
-			return;
-		}
-
-		wp_enqueue_script(
-			'betterblocks-force-preview',
-			plugin_dir_url(__FILE__) . '../js/betterblocks-force-preview.js',
-			array( 'jquery', 'wp-dom-ready', 'wp-data', 'wp-blocks', 'wp-element' ),
-			$this->version,
-			true
-		);
-
-	}
-
-	/**
-	 * Callback function for betterblocks_sidebar_acf plugin setting.
-	 * 
-	 * @since    1.0.0
-	 */
-	public function betterblocks_sidebar_acf() {
-
-		if ( !get_option( 'betterblocks_sidebar_acf', 0 ) ) {
-			wp_add_inline_style( 'wp-block-editor', '.block-editor .acf-block-panel { display: none !important; }' );
 		}
 
 	}

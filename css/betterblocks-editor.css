@@ -1,0 +1,56 @@
+/**
+ * Tidy appearance of post titles in the editor canvas.
+ */
+.editor-styles-wrapper .edit-post-visual-editor__post-title-wrapper,
+.editor-styles-wrapper .edit-post-visual-editor__post-title-wrapper h1.wp-block-post-title {
+    margin-top: 0 !important;
+}
+
+h1.wp-block-post-title {
+    font-size: 18px;
+    line-height: 28px;
+    background-color: white;
+    padding: 10px 30px !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    border-bottom: 1px solid #e0e0e0 !important;
+}
+
+/**
+ * Tidy appearance of blocks in the editor canvas.
+ */
+.editor-styles-wrapper {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.wp-block-post-content {
+    padding: 10px;
+    margin: 0 auto !important;
+    max-width: calc(100% - 60px);
+    width: calc(100% - 60px);
+}
+
+.wp-block-post-content .block-list-appender {
+    margin: 20px auto !important;
+}
+
+.wp-block {
+    margin: 0 auto !important;
+    max-width: 100%;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+.wp-block-post-content.is-tablet-preview .wp-block,
+.wp-block-post-content.is-mobile-preview .wp-block {
+    max-width: 100%;
+    width: 100%;
+}
+
+/**
+ * Change opacity for blocks set as hidden on the frontend.
+ */
+.hide-block--active {
+    opacity: 0.4;
+}

@@ -1,15 +1,14 @@
 /**
- *
- * Add button to block toolbar to hide block from frontend when enabled.
+ * Add controls to hide a block from the frontend.
  */
-
 (function (wp) {
+  'use strict';
+
   if (window.betterBlocksInitialized) {
     return;
   }
-  if (!wp.data.select('core/interface') && !window.betterBlocksInitialized) {
-    window.betterBlocksInitialized = true;
-  }
+
+  window.betterBlocksInitialized = true;
 
   var __ = wp.i18n.__;
   var addFilter = wp.hooks.addFilter;
@@ -21,11 +20,8 @@
   var ToolbarButton = wp.components.ToolbarButton;
   var ToggleControl = wp.components.ToggleControl;
 
-  wp.hooks.removeFilter('blocks.registerBlockType', 'betterblocks/hide-block-attribute');
-  wp.hooks.removeFilter('editor.BlockEdit', 'betterblocks/with-inspector-control');
-
-  addFilter('blocks.registerBlockType', 'betterblocks/hide-block-attribute', function (settings, name) {
-    settings.attributes = Object.assign(settings.attributes, {
+  addFilter('blocks.registerBlockType', 'betterblocks/hide-block-attribute', function (settings) {
+    settings.attributes = Object.assign({}, settings.attributes, {
       betterblocks_disable_frontend_block: {
         type: 'boolean',
         default: false,
@@ -35,15 +31,25 @@
     return settings;
   });
 
-  var withInspectorControl = createHigherOrderComponent(function (BlockEdit) {
+  /**
+   * Only render BetterBlocks controls for the currently selected block.
+   */
+  var withHideBlockControls = createHigherOrderComponent(function (BlockEdit) {
     return function (props) {
+      if (!props.isSelected) {
+        return wp.element.createElement(BlockEdit, props);
+      }
+
+      var isHidden = !!props.attributes.betterblocks_disable_frontend_block;
+
       var toggleHideBlock = function () {
-        props.setAttributes({ betterblocks_disable_frontend_block: !props.attributes.betterblocks_disable_frontend_block });
+        props.setAttributes({ betterblocks_disable_frontend_block: !isHidden });
       };
 
       return wp.element.createElement(
         Fragment,
         null,
+        wp.element.createElement(BlockEdit, props),
         wp.element.createElement(
           BlockControls,
           null,
@@ -51,127 +57,142 @@
             ToolbarGroup,
             { className: 'hide-block__toolbar' },
             wp.element.createElement(ToolbarButton, {
-              icon: props.attributes.betterblocks_disable_frontend_block ? 'hidden' : 'visibility',
-              label: props.attributes.betterblocks_disable_frontend_block ? __('Show Block', 'betterblocks') : __('Hide Block', 'betterblocks'),
+              icon: isHidden ? 'hidden' : 'visibility',
+              label: isHidden ? __('Show Block', 'betterblocks') : __('Hide Block', 'betterblocks'),
               onClick: toggleHideBlock,
             })
           )
         ),
-        wp.element.createElement('div', { className: props.attributes.betterblocks_disable_frontend_block ? 'hide-block--active' : '' }, wp.element.createElement(BlockEdit, props)),
         wp.element.createElement(
           InspectorAdvancedControls,
           null,
           wp.element.createElement(ToggleControl, {
             label: __('Hide Block', 'betterblocks'),
-            checked: !!props.attributes.betterblocks_disable_frontend_block,
+            checked: isHidden,
             onChange: toggleHideBlock,
-            help: props.attributes.betterblocks_disable_frontend_block ? __('Block is hidden', 'betterblocks') : __('Block is visible', 'betterblocks'),
+            help: isHidden ? __('Block is hidden', 'betterblocks') : __('Block is visible', 'betterblocks'),
           })
         )
       );
     };
-  }, 'withInspectorControl');
+  }, 'withHideBlockControls');
 
-  addFilter('editor.BlockEdit', 'betterblocks/with-inspector-control', withInspectorControl);
+  /**
+   * Apply the hidden appearance to WordPress's existing block wrapper instead
+   * of adding an extra wrapper around every block's editor output.
+   */
+  var withHideBlockClass = createHigherOrderComponent(function (BlockListBlock) {
+    return function (props) {
+      var isHidden = !!props.attributes.betterblocks_disable_frontend_block;
+      var className = [props.className, isHidden ? 'hide-block--active' : '']
+        .filter(Boolean)
+        .join(' ');
+
+      return wp.element.createElement(
+        BlockListBlock,
+        Object.assign({}, props, { className: className })
+      );
+    };
+  }, 'withHideBlockClass');
+
+  addFilter('editor.BlockEdit', 'betterblocks/with-hide-block-controls', withHideBlockControls);
+  addFilter('editor.BlockListBlock', 'betterblocks/with-hide-block-class', withHideBlockClass);
 })(window.wp);
 
 /**
- *
- * Allow block editor sidebar to be resized with drag and drop.
+ * Allow the block editor settings sidebar to be resized by dragging its left edge.
+ * WordPress itself controls whether the sidebar is open or closed.
  */
-
 (function ($) {
-  ('use strict');
+  'use strict';
 
   $(function () {
-    const sidebar_width_key = 'betterblocks_sidebar_width';
-    const sidebar_selector = '.interface-interface-skeleton__sidebar';
-    const pinned_item_selector = '.interface-pinned-items button';
-    const close_sidebar_selector = '.editor-sidebar__panel-tabs button[aria-label="Close Settings"]';
-    const layout_selector = '.edit-post-layout, .edit-site-layout';
+    var sidebarWidthKey = 'betterblocks_sidebar_width';
+    var sidebarSelector = '.interface-interface-skeleton__sidebar';
+    var observer = null;
+    var initScheduled = false;
+
+    function getStoredSidebarWidth() {
+      try {
+        return window.localStorage.getItem(sidebarWidthKey);
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function saveSidebarWidth(width) {
+      try {
+        window.localStorage.setItem(sidebarWidthKey, String(width));
+      } catch (error) {
+        // Storage can be unavailable under restrictive browser/privacy settings.
+      }
+    }
+
+    function getSavedWidth() {
+      var savedWidth = parseInt(getStoredSidebarWidth(), 10);
+
+      if (Number.isNaN(savedWidth)) {
+        return 280;
+      }
+
+      return Math.min(Math.max(savedWidth, 280), 700);
+    }
 
     function initResizableSidebar() {
-      const $sidebar = $(sidebar_selector);
+      $(sidebarSelector).each(function () {
+        var $sidebar = $(this);
 
-      if ($sidebar.length === 0) {
+        if ($sidebar.hasClass('ui-resizable')) {
+          return;
+        }
+
+        $sidebar.width(getSavedWidth());
+
+        $sidebar.resizable({
+          handles: 'w',
+          minWidth: 280,
+          maxWidth: 700,
+          resize: function () {
+            $(this).css({
+              left: 'auto',
+              right: 0,
+            });
+          },
+          stop: function () {
+            saveSidebarWidth(Math.round($(this).width()));
+          },
+        });
+
+        var $handle = $sidebar.find('.ui-resizable-w');
+
+        if (!$handle.find('.betterblocks-resize-indicator').length) {
+          $handle.append('<div class="betterblocks-resize-indicator"></div>');
+        }
+      });
+    }
+
+    function scheduleResizableSidebarInit() {
+      if (initScheduled) {
         return;
       }
 
-      const savedWidth = localStorage.getItem(sidebar_width_key);
+      initScheduled = true;
 
-      if (savedWidth) {
-        $sidebar.width(savedWidth);
-      }
-
-      if ($sidebar.hasClass('ui-resizable')) {
-        $sidebar.resizable('destroy');
-      }
-
-      $sidebar.resizable({
-        handles: 'w',
-        minWidth: 280,
-        maxWidth: 700,
-        resize: function (event, ui) {
-          $(this).css({
-            left: 'auto',
-            right: 0,
-          });
-          localStorage.setItem(sidebar_width_key, $(this).width());
-        },
-      });
-
-      $sidebar.find('.ui-resizable-w').css({
-        left: '0',
-        width: '10px',
-        height: '100%',
-      });
-
-      if ($sidebar.find('.betterblocks-resize-indicator').length === 0) {
-        $sidebar.find('.ui-resizable-w').append('<div class="betterblocks-resize-indicator"></div>');
-      }
-
-      $sidebar.width(savedWidth || 280);
-    }
-
-    function updateSidebarVisibility() {
-      const isSidebarOpen = $(pinned_item_selector)
-        .toArray()
-        .some((button) => $(button).hasClass('is-pressed'));
-      $(layout_selector).toggleClass('is-sidebar-opened', isSidebarOpen);
-    }
-
-    function setupEventListeners() {
-      $('body').on('click', pinned_item_selector, updateSidebarVisibility);
-
-      $('body').on('click', close_sidebar_selector, function () {
-        const $sidebar = $(sidebar_selector);
-        if ($sidebar.length) {
-          $sidebar.hide();
-          $(layout_selector).removeClass('is-sidebar-opened');
-        }
+      window.requestAnimationFrame(function () {
+        initScheduled = false;
+        initResizableSidebar();
       });
     }
 
-    function init() {
-      const checkInterval = setInterval(() => {
-        if ($(sidebar_selector).length) {
-          clearInterval(checkInterval);
-          initResizableSidebar();
-          updateSidebarVisibility();
-          setupEventListeners();
-        }
-      }, 1000);
+    initResizableSidebar();
 
-      function periodicCheck() {
-        const $sidebar = $(sidebar_selector);
-        if ($sidebar.length && !$sidebar.hasClass('ui-resizable')) {
-          initResizableSidebar();
-        }
-      }
+    observer = new MutationObserver(function () {
+      scheduleResizableSidebarInit();
+    });
 
-      setInterval(periodicCheck, 10000);
-    }
-
-    init();
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
   });
 })(jQuery);
