@@ -6,7 +6,7 @@ Tags: betterblocks, block editor, optimisation, usability
 Requires at least: 5.0
 Requires PHP: 7.4
 Tested up to: 7.1
-Stable tag: 1.0.19
+Stable tag: 1.0.20
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -43,13 +43,16 @@ No, BetterBlocks doesn’t add new blocks, but rather focuses on enhancing the e
 
 == Changelog ==
 
+= 1.0.20 =
+* Removed the custom Update URI so WordPress.org can provide plugin updates normally.
+
 = 1.0.19 =
 * Adjusted the full-screen ACF block form modal dimensions in the WordPress 7.1 editor.
 * Removed the ACF sidebar visibility setting; ACF block fields now always remain available in the editor sidebar.
 * Removed the ACF Force Preview Mode setting and force-preview functionality.
 * Improved Hide Block editor rendering by using the native block wrapper and only loading controls for the selected block.
 * Throttled sidebar resize initialization and made saved sidebar width storage fail-safe.
-* Added plugin compatibility metadata for WordPress, PHP, and private update protection.
+* Added plugin compatibility metadata for WordPress and PHP.
 
 = 1.0.18 =
 * Updated block editor asset loading for the always-iframed editor in WordPress 7.1.

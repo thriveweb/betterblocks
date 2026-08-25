@@ -3,10 +3,9 @@
  * Plugin Name:       BetterBlocks
  * Plugin URI:        https://thriveweb.com.au/the-lab/betterblocks/
  * Description:       Handy improvements for the Wordpress block editor interface such as post type support, hiding blocks, adjustable sidebar, and more.
- * Version:           1.0.19
+ * Version:           1.0.20
  * Requires at least: 5.0
  * Requires PHP:      7.4
- * Update URI:        https://thriveweb.com.au/the-lab/betterblocks/
  * Author:            Thrive Digital
  * Author URI:        https://thriveweb.com.au/
  * License:           GPL-2.0+
@@ -22,7 +21,7 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Current plugin version.
  */
-define( 'BETTERBLOCKS_VERSION', '1.0.19' );
+define( 'BETTERBLOCKS_VERSION', '1.0.20' );
 
 /**
  * The core plugin class that is used to define internationalization,
